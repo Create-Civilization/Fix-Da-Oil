@@ -1,7 +1,9 @@
 package wiiu.mavity.oilfixtfmg.blocks;
 
+import com.drmangotea.tfmg.registry.TFMGBlocks;
+
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,11 +18,11 @@ import java.util.function.Supplier;
 @SuppressWarnings("SameParameterValue")
 public class OilFixBlocks {
 
-	public static final DeferredRegister<Block> BLOCKS =
-		DeferredRegister.create(ForgeRegistries.BLOCKS, OilFixTFMG.MOD_ID);
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, OilFixTFMG.MOD_ID);
 
-	public static RegistryObject<Block> OIL_DEPOSIT_BLOCK =registerBlock("oil_deposit_block",
-		() -> new OilDepositBlock(BlockBehaviour.Properties.copy(Blocks.STONE)));
+	public static RegistryObject<Block> OIL_DEPOSIT_BLOCK = registerBlock(
+		"oil_deposit_block", () -> new OilDepositBlock(BlockBehaviour.Properties.copy(TFMGBlocks.OIL_DEPOSIT.get()))
+	);
 
 	private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block) {
 		RegistryObject<T> toReturn = BLOCKS.register(name, block);
