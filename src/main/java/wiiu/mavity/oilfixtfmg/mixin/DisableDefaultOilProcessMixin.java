@@ -5,8 +5,8 @@ import com.drmangotea.tfmg.registry.TFMGBlocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -20,31 +20,39 @@ public abstract class DisableDefaultOilProcessMixin {
 
 	@SuppressWarnings("DiscouragedShift")
     @Inject(
-            method = "process",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;setFluid(Lnet/minecraftforge/fluids/FluidStack;)V",
-                    shift = At.Shift.BEFORE
-            ),
-            remap = false,
-            cancellable = true
+		method = "process",
+		at = @At(
+			value = "INVOKE",
+			target = "Lnet/minecraftforge/fluids/capability/templates/FluidTank;setFluid(Lnet/minecraftforge/fluids/FluidStack;)V",
+			shift = At.Shift.BEFORE
+		),
+		remap = false,
+		cancellable = true
     )
     public void interceptProcessing(CallbackInfo ci) {
         ci.cancel();
     }
 
     @SuppressWarnings("resource")
-	@Inject(method = "findDeposit", at = @At(value = "HEAD"), remap = false, cancellable = true)
+	@Inject(
+		method = "findDeposit",
+		at = @At(
+			value = "HEAD"
+		),
+		remap = false,
+		cancellable = true
+	)
     public void disableDefaultOilProcess(CallbackInfo ci) {
 		ci.cancel();
-		for(int i = 0; i < this.mixinGetPos().getY() + 64; ++i) {
+		for(int i = 0; i < this.mixinGetPos().getY() + 64; i++) {
 			BlockPos checkedPos = new BlockPos(this.mixinGetPos().getX(), this.mixinGetPos().getY() - 1 - i, this.mixinGetPos().getZ());
-			if (this.mixinGetLevel().getBlockState(new BlockPos(checkedPos)).is(TFMGBlocks.OIL_DEPOSIT.get())) {
+			BlockState state = this.mixinGetLevel().getBlockState(checkedPos);
+			if (state.is(TFMGBlocks.OIL_DEPOSIT.get())) {
 				this.deposit = checkedPos;
 				return;
 			}
 
-			if (!this.mixinGetLevel().getBlockState(new BlockPos(checkedPos)).is(TFMGBlocks.INDUSTRIAL_PIPE.get())) {
+			if (!state.is(TFMGBlocks.INDUSTRIAL_PIPE.get())) {
 				this.deposit = null;
 				return;
 			}
@@ -58,6 +66,6 @@ public abstract class DisableDefaultOilProcessMixin {
 
 	@Unique
 	public Level mixinGetLevel() {
-		return ((PumpjackBaseBlockEntity) (Object) this).getLevel();
+		return ((PumpjackBaseBlockEntity)(Object)this).getLevel();
 	}
 }
