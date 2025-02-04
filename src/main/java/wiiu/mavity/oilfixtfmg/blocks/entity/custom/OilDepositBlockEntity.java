@@ -1,19 +1,28 @@
-package wiiu.mavity.oilfixtfmg.blocks.entity;
-
+package wiiu.mavity.oilfixtfmg.blocks.entity.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
+import wiiu.mavity.oilfixtfmg.Config;
+import wiiu.mavity.oilfixtfmg.blocks.entity.OilFixBlockEntities;
 
 public class OilDepositBlockEntity extends BlockEntity {
 
-
-	private int oilLevel;
+	private int oilLevel = Config.SERVER.oilPerDeposit.get();
 
 	public OilDepositBlockEntity(BlockPos pPos, BlockState pBlockState) {
 		super(OilFixBlockEntities.OIL_DEPOSIT_BLOCK_ENTITY.get(), pPos, pBlockState);
+	}
+
+	public void setOilLevel(int oilLevel) {
+		this.oilLevel = oilLevel;
+	}
+
+	public int getOilLevel() {
+		return oilLevel;
 	}
 
 	@Override
@@ -21,9 +30,8 @@ public class OilDepositBlockEntity extends BlockEntity {
 		oilLevel = pCompound.getInt("OilLevel");
 	}
 
-
 	@Override
-	protected void saveAdditional(CompoundTag pTag) {
+	public void saveAdditional(CompoundTag pTag) {
 		pTag.putInt("OilLevel", oilLevel);
 	}
 }

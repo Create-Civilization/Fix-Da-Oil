@@ -1,24 +1,35 @@
 package wiiu.mavity.oilfixtfmg.mixin;
 
 import com.drmangotea.tfmg.blocks.machines.oil_processing.pumpjack.base.PumpjackBaseBlockEntity;
-import com.drmangotea.tfmg.registry.TFMGBlocks;
+import com.drmangotea.tfmg.registry.*;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-
 import net.minecraft.world.level.block.state.BlockState;
+
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
+
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@SuppressWarnings("AddedMixinMembersNamePattern")
+import wiiu.mavity.oilfixtfmg.blocks.OilFixBlocks;
+import wiiu.mavity.oilfixtfmg.blocks.entity.custom.OilDepositBlockEntity;
+
+@SuppressWarnings({"AddedMixinMembersNamePattern", "DiscouragedShift", "resource"})
 @Mixin(PumpjackBaseBlockEntity.class)
 public abstract class DisableDefaultOilProcessMixin {
 
 	@Shadow
 	public BlockPos deposit;
 
-	@SuppressWarnings("DiscouragedShift")
+	@Shadow
+	public FluidTank tankInventory;
+
+	@Shadow
+	public int miningRate;
+
     @Inject(
 		method = "process",
 		at = @At(
@@ -31,9 +42,19 @@ public abstract class DisableDefaultOilProcessMixin {
     )
     public void interceptProcessing(CallbackInfo ci) {
         ci.cancel();
+		OilDepositBlockEntity blockEntity = (OilDepositBlockEntity)this.mixinGetLevel().getBlockEntity(this.deposit);
+		assert blockEntity != null;
+		int leftOverOilInDeposit = blockEntity.getOilLevel() - this.miningRate;
+		if (leftOverOilInDeposit <= 0) return;
+		blockEntity.setOilLevel(leftOverOilInDeposit);
+		this.tankInventory.setFluid(
+			new FluidStack(
+				TFMGFluids.CRUDE_OIL.getSource(),
+				this.tankInventory.getFluidAmount() + this.miningRate
+			)
+		);
     }
 
-    @SuppressWarnings("resource")
 	@Inject(
 		method = "findDeposit",
 		at = @At(
@@ -42,12 +63,14 @@ public abstract class DisableDefaultOilProcessMixin {
 		remap = false,
 		cancellable = true
 	)
-    public void disableDefaultOilProcess(CallbackInfo ci) {
+    public void interceptDepositSearch(CallbackInfo ci) {
 		ci.cancel();
-		for(int i = 0; i < this.mixinGetPos().getY() + 64; i++) {
-			BlockPos checkedPos = new BlockPos(this.mixinGetPos().getX(), this.mixinGetPos().getY() - 1 - i, this.mixinGetPos().getZ());
+		BlockPos pos = this.mixinGetPos();
+		int y = pos.getY();
+		for(int i = 0; i < y + 64; i++) {
+			BlockPos checkedPos = new BlockPos(pos.getX(), y - 1 - i, pos.getZ());
 			BlockState state = this.mixinGetLevel().getBlockState(checkedPos);
-			if (state.is(TFMGBlocks.OIL_DEPOSIT.get())) {
+			if (state.is(OilFixBlocks.OIL_DEPOSIT_BLOCK.get())) {
 				this.deposit = checkedPos;
 				return;
 			}
