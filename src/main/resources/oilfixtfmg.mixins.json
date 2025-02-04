@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "wiiu.mavity.oilfixtfmg.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "oilfixtfmg.refmap.json",
+  "mixins": [
+    "DisableDefaultOilProcessMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
