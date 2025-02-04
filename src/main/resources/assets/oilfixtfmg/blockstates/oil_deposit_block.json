@@ -1,7 +1,7 @@
 {
 	"variants": {
 		"": {
-			"model": "oilfixtgmf:block/oil_deposit_block"
+			"model": "oilfixtfmg:block/oil_deposit_block"
 		}
 	}
 }

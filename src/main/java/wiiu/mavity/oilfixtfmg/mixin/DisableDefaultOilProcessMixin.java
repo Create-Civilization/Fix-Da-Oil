@@ -42,17 +42,19 @@ public abstract class DisableDefaultOilProcessMixin {
     )
     public void interceptProcessing(CallbackInfo ci) {
         ci.cancel();
-		OilDepositBlockEntity blockEntity = (OilDepositBlockEntity)this.mixinGetLevel().getBlockEntity(this.deposit);
-		assert blockEntity != null;
-		int leftOverOilInDeposit = blockEntity.getOilLevel() - this.miningRate;
-		if (leftOverOilInDeposit <= 0) return;
-		blockEntity.setOilLevel(leftOverOilInDeposit);
-		this.tankInventory.setFluid(
-			new FluidStack(
-				TFMGFluids.CRUDE_OIL.getSource(),
-				this.tankInventory.getFluidAmount() + this.miningRate
-			)
-		);
+		var blockEntity = this.mixinGetLevel().getBlockEntity(this.deposit);
+		if (blockEntity == null) deposit = null;
+		else if (blockEntity instanceof OilDepositBlockEntity BE) {
+			int leftOverOilInDeposit = BE.getOilLevel() - this.miningRate;
+			if (leftOverOilInDeposit <= 0) return;
+			BE.setOilLevel(leftOverOilInDeposit);
+			this.tankInventory.setFluid(
+				new FluidStack(
+					TFMGFluids.CRUDE_OIL.getSource(),
+					this.tankInventory.getFluidAmount() + this.miningRate
+				)
+			);
+		}
     }
 
 	@Inject(
@@ -67,7 +69,7 @@ public abstract class DisableDefaultOilProcessMixin {
 		ci.cancel();
 		BlockPos pos = this.mixinGetPos();
 		int y = pos.getY();
-		for(int i = 0; i < y + 64; i++) {
+		for (int i = 0; i < y + 64; i++) {
 			BlockPos checkedPos = new BlockPos(pos.getX(), y - 1 - i, pos.getZ());
 			BlockState state = this.mixinGetLevel().getBlockState(checkedPos);
 			if (state.is(OilFixBlocks.OIL_DEPOSIT_BLOCK.get())) {

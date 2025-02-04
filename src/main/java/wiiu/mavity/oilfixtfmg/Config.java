@@ -17,8 +17,12 @@ public class Config {
 
 	public Config(ForgeConfigSpec.Builder builder) {
 		oilPerDeposit = builder
-			.comment("The amount of oil per oil deposit.")
+			.comment("The amount of oil per oil deposit. (mB)")
 			.translation("oilfixtfmg.oilPerDeposit")
-			.defineInRange("oilPerDeposit", 500, 1, Integer.MAX_VALUE);
+			.defineInRange("oilPerDeposit", 10000000, 1, Integer.MAX_VALUE);
+	}
+
+	static {
+		load();
 	}
 }

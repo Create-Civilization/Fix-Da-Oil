@@ -22,16 +22,16 @@ public class OilDepositBlockEntity extends BlockEntity {
 	}
 
 	public int getOilLevel() {
-		return oilLevel;
+		return this.oilLevel;
 	}
 
 	@Override
 	public void load(CompoundTag pCompound) {
-		oilLevel = pCompound.getInt("OilLevel");
+		this.setOilLevel(pCompound.getInt("OilLevel"));
 	}
 
 	@Override
 	public void saveAdditional(CompoundTag pTag) {
-		pTag.putInt("OilLevel", oilLevel);
+		pTag.putInt("OilLevel", this.getOilLevel());
 	}
 }

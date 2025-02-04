@@ -1,7 +1,7 @@
 package wiiu.mavity.oilfixtfmg.blocks.custom;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -17,5 +17,11 @@ public class OilDepositBlock extends BaseEntityBlock {
 	@SuppressWarnings("NullableProblems")
 	public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
 		return new OilDepositBlockEntity(pPos, pState);
+	}
+
+	@SuppressWarnings("NullableProblems")
+	@Override
+	public RenderShape getRenderShape(BlockState pState) {
+		return RenderShape.MODEL;
 	}
 }
